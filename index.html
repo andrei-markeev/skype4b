@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <script src="auth.js"></script>
+        <style>
+            .btn {
+                color: #ffffff;
+                background-color: #14a7ed;
+                border-color: #04a4ed;
+                display: inline-block;
+                padding: 6px 12px;
+                margin: 0;
+                font-size: 20px;
+                font-weight: normal;
+                line-height: 1.428571429;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                cursor: pointer;
+                background-image: none;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -o-user-select: none;
+                user-select: none;
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    <body>
+        <p><label>Enter client ID of your Azure app:</label><input id="client_id" type="text" /></p>
+        <a href="javascript:void(0)" class="btn" onclick="startAutodiscovery();">Log in with Skype for Business</a>
+        <p>Please use DevTools -> Network tab for monitoring what happens.</p>
+    </body>
+</html>
