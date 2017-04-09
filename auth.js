@@ -117,7 +117,7 @@ function initializeSession(access_token) {
         EndpointId: random_guid
     };
 
-    proxyPost(access_token, applicationsUrl, initData, function() {
+    proxyPost(access_token, url, initData, function() {
         if (xmlhttp.status == 403)
             throw Error(xmlhttp.getResponseHeader("X-Ms-diagnostics"));
         else if (xmlhttp.status == 201) {
@@ -150,13 +150,15 @@ function proxyGet(access_token, url, callback)
 
 function proxyPost(access_token, url, data, callback)
 {
-    // perform ajax request 
+    var url = "http://markeev.com/posts/skype4b/proxy.php?url=" + url + "&access_token=" + access_token;
+
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
-            show(xmlhttp.responseText);
+            callback(xmlhttp.responseText);
         }
     };
-    xmlhttp.open("POST", url, true);
+    xmlhttp.open("POST",  url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/json");
     xmlhttp.send(JSON.stringify(data));
 }
