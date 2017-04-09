@@ -1,27 +1,33 @@
 <?php
-    if ($_SERVER['HTTP_REFERER'] != "http://markeev.com/posts/skype4b/"
-        && $_SERVER['HTTP_REFERER'] != "https://andrei-markeev.github.io/skype4b/"
-        && $_SERVER['HTTP_ORIGIN'] != "http://markeev.com"
-        && $_SERVER['HTTP_ORIGIN'] != "https://andrei-markeev.github.io"
-        || !preg_match("/^https:\/\/[^\/]*\.lync\.com\//i", $_GET["url"])) {
-    header('HTTP/1.0 403 Forbidden');
-    echo $_SERVER['HTTP_REFERER'];
-    return;
+    $origin = empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_ORIGIN'] : $_SERVER['HTTP_REFERER'];
+    if (!preg_match("/^(http:\/\/markeev\.com|https:\/\/andrei\-markeev\.github\.io)/", $origin)
+        || !preg_match("/^https:\/\/[^\/]*\.lync\.com\//i", $_GET["url"]))
+    {
+        header('HTTP/1.0 403 Forbidden');
+        echo "Requests from origin " . $origin . " are not allowed.";
+        return;
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] == "OPTIONS") {
+        header("Access-Control-Allow-Origin: ". $origin, true);
+        header("Access-Control-Allow-Credentials: true", true);
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS", true);
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+        return;
     }
 
     $ch = curl_init($_GET["url"]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $headers = array(
         'Authorization: Bearer '.$_GET["access_token"],
-        'Accept: application/json'
+        'Accept: application/json',
+        'Content-Type: application/json'
     );
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $postData = Array();
-        parse_str(file_get_contents("php://input"), $postData);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents("php://input"));
     }
 
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -34,10 +40,12 @@
     curl_close($ch);
 
     foreach (explode("\r\n", $responseHeaders) as $header) {
-    header(trim($header), false);
+        header(trim($header), false);
     }
-    header("Access-Control-Allow-Origin: ". (empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_ORIGIN'] : $_SERVER["HTTP_REFERER"]), true);
+
+    header("Access-Control-Allow-Origin: ". $origin, true);
     header("Access-Control-Allow-Credentials: true", true);
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS", true);
+    
     echo $responseBody;
 ?>

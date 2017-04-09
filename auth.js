@@ -6,7 +6,7 @@ var clientId = ""; // put client ID of your Azure application here
 
 // startup code
 
-clientId = clientId || document.getElementById("client_id").value || localStorage.getItem("client_id");
+clientId = clientId || localStorage.getItem("client_id");
 localStorage.setItem("client_id", clientId);
 document.getElementById("client_id").value = clientId;
 
@@ -17,6 +17,7 @@ if (document.location.hash && document.location.hash.length > 1) {
 // ---
 
 function startAutodiscovery() {
+    clientId = clientId || document.getElementById("client_id").value;
     var initialHubUrl = "https://webdir.online.lync.com/autodiscover/autodiscoverservice.svc/root";
     get(initialHubUrl, function(xmlhttp) {
         getHubUrl(JSON.parse(xmlhttp.responseText)._links.self.href);
@@ -117,7 +118,7 @@ function initializeSession(access_token) {
         EndpointId: random_guid
     };
 
-    proxyPost(access_token, url, initData, function() {
+    proxyPost(access_token, url, initData, function(xmlhttp) {
         if (xmlhttp.status == 403)
             throw Error(xmlhttp.getResponseHeader("X-Ms-diagnostics"));
         else if (xmlhttp.status == 201) {
@@ -155,7 +156,7 @@ function proxyPost(access_token, url, data, callback)
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
-            callback(xmlhttp.responseText);
+            callback(xmlhttp);
         }
     };
     xmlhttp.open("POST",  url, true);
