@@ -3,15 +3,20 @@ var clientId = ""; // put client ID of your Azure application here
 
 // call startAutodiscovery() to start the autodiscovery
 
-// startup code: try reading access_code from hash
-// if no access_code then start autodiscovery
+
+// startup code
+
+clientId = clientId || document.getElementById("client_id").value || localStorage.getItem("client_id");
+localStorage.setItem("client_id", clientId);
+document.getElementById("client_id").value = clientId;
 
 if (document.location.hash && document.location.hash.length > 1) {
     parseHash();
 }
 
+// ---
+
 function startAutodiscovery() {
-    clientId = clientId || document.getElementById("client_id").value;
     var initialHubUrl = "https://webdir.online.lync.com/autodiscover/autodiscoverservice.svc/root";
     get(initialHubUrl, function(xmlhttp) {
         getHubUrl(JSON.parse(xmlhttp.responseText)._links.self.href);
