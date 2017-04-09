@@ -1,5 +1,5 @@
 <?php
-    $origin = empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_ORIGIN'] : $_SERVER['HTTP_REFERER'];
+    $origin = empty($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_REFERER'] : $_SERVER['HTTP_ORIGIN'];
     if (!preg_match("/^(http:\/\/markeev\.com|https:\/\/andrei\-markeev\.github\.io)/", $origin)
         || !preg_match("/^https:\/\/[^\/]*\.lync\.com\//i", $_GET["url"]))
     {

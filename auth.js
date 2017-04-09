@@ -7,7 +7,6 @@ var clientId = ""; // put client ID of your Azure application here
 // startup code
 
 clientId = clientId || localStorage.getItem("client_id");
-localStorage.setItem("client_id", clientId);
 document.getElementById("client_id").value = clientId;
 
 if (document.location.hash && document.location.hash.length > 1) {
@@ -17,7 +16,8 @@ if (document.location.hash && document.location.hash.length > 1) {
 // ---
 
 function startAutodiscovery() {
-    clientId = clientId || document.getElementById("client_id").value;
+    clientId = document.getElementById("client_id").value || clientId;
+    localStorage.setItem("client_id", clientId);
     var initialHubUrl = "https://webdir.online.lync.com/autodiscover/autodiscoverservice.svc/root";
     get(initialHubUrl, function(xmlhttp) {
         getHubUrl(JSON.parse(xmlhttp.responseText)._links.self.href);
@@ -145,13 +145,13 @@ function get(url, callback)
 
 function proxyGet(access_token, url, callback)
 {
-    var url = "http://markeev.com/posts/skype4b/proxy.php?url=" + url + "&access_token=" + access_token;
+    var url = "https://markeev.com/posts/skype4b/proxy.php?url=" + url + "&access_token=" + access_token;
     get(url, callback);
 }
 
 function proxyPost(access_token, url, data, callback)
 {
-    var url = "http://markeev.com/posts/skype4b/proxy.php?url=" + url + "&access_token=" + access_token;
+    var url = "https://markeev.com/posts/skype4b/proxy.php?url=" + url + "&access_token=" + access_token;
 
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
