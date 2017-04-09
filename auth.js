@@ -13,7 +13,7 @@ if (document.location.hash && document.location.hash.length > 1) {
 function startAutodiscovery() {
     clientId = clientId || document.getElementById("client_id").value;
     var initialHubUrl = "https://webdir.online.lync.com/autodiscover/autodiscoverservice.svc/root";
-    get(null, initialHubUrl, function(xmlhttp) {
+    get(initialHubUrl, function(xmlhttp) {
         getHubUrl(JSON.parse(xmlhttp.responseText)._links.self.href);
     });
 }
@@ -80,7 +80,7 @@ function continueAutodiscovery(access_token) {
     var hub_url = localStorage.getItem("hubUrl");
     var url = hub_url + "/autodiscover/autodiscoverservice.svc/root/oauth/user";
     
-    get(access_token, url, function(xmlhttp) {
+    proxyGet(access_token, url, function(xmlhttp) {
         if (xmlhttp.status == 200) {
             var response = JSON.parse(xmlhttp.responseText);
             if (response._links.redirect)
@@ -112,7 +112,7 @@ function initializeSession(access_token) {
         EndpointId: random_guid
     };
 
-    post(access_token, applicationsUrl, initData, function() {
+    proxyPost(access_token, applicationsUrl, initData, function() {
         if (xmlhttp.status == 403)
             throw Error(xmlhttp.getResponseHeader("X-Ms-diagnostics"));
         else if (xmlhttp.status == 201) {
@@ -124,7 +124,7 @@ function initializeSession(access_token) {
     });
 }
 
-function get(access_token, url, callback)
+function get(url, callback)
 {
     // perform ajax request 
     var xmlhttp = new XMLHttpRequest();
@@ -134,13 +134,16 @@ function get(access_token, url, callback)
         }
     };
     xmlhttp.open("GET", url, true);
-    if (access_token)
-        xmlhttp.setRequestHeader("Authorization", "Bearer " + access_token);
-    xmlhttp.setRequestHeader("Accept", "application/json");
     xmlhttp.send();
 }
 
-function post(access_token, url, data, callback)
+function proxyGet(access_token, url, callback)
+{
+    var url = "http://markeev.com/posts/skype4b/proxy.php?url=" + url + "&access_token=" + access_token;
+    get(url, callback);
+}
+
+function proxyPost(access_token, url, data, callback)
 {
     // perform ajax request 
     var xmlhttp = new XMLHttpRequest();
@@ -150,9 +153,5 @@ function post(access_token, url, data, callback)
         }
     };
     xmlhttp.open("POST", url, true);
-    if (access_token)
-        xmlhttp.setRequestHeader("Authorization", "Bearer " + access_token);
-    xmlhttp.setRequestHeader("Accept", "application/json");
-    xmlhttp.setRequestHeader("Content-type", "application/json");
     xmlhttp.send(JSON.stringify(data));
 }
